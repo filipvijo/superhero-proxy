@@ -1,14 +1,27 @@
 const express = require("express");
 const axios = require("axios");
-const cors = require("cors"); // Add this line
+const cors = require("cors");
 require("dotenv").config();
 
 const app = express();
 const port = 3001;
 
-// Enable CORS for requests from http://localhost:5173
+// Allow requests from multiple origins
+const allowedOrigins = [
+  "http://localhost:5173", // Local development
+  "https://superhero-finder-roan.vercel.app" // Vercel deployment (replace with your actual Vercel URL)
+];
+
 app.use(cors({
-  origin: "http://localhost:5173"
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    } else {
+      return callback(new Error("Not allowed by CORS"));
+    }
+  }
 }));
 
 const API_KEY = process.env.SUPERHERO_API_KEY;
